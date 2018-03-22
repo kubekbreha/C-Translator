@@ -101,7 +101,7 @@ void next_symbol(){
             // Kontrola klucovych slov
             if (!strcmp(id, "read")) {
                 lex_symbol = READ;
-            } else if (!strcmp(id, "print") == 0) {
+            } else if (!strcmp(id, "print")) {
                 lex_symbol = PRINT;
             } else { // Ulozenie do tabulky identifikatorov
                 lex_attr = store_id(id);

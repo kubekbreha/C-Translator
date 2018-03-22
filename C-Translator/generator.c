@@ -124,6 +124,8 @@ void write_string(const char *str){
 
 void write_var(short index) {
     // TODO
+    put_op_attr(LDA, index+VAR_OFFSET);
+    put_word(PUSH);
 }
 
 void write_add() {
@@ -136,18 +138,40 @@ void write_add() {
 
 void write_sub() {
     // TODO
+    put_word(POP);
+    put_word(STA);
+    put_word(WORK_MEM);
+    put_word(POP);
+    put_word(SUB);
+    put_word(WORK_MEM);
+    put_word(PUSH);
 }
 
 void write_mul() {
     // TODO
+    put_word(POP);
+    put_word(STA);
+    put_word(WORK_MEM);
+    put_word(POP);
+    put_word(MUL);
+    put_word(WORK_MEM);
+    put_word(PUSH);
 }
 
 void write_div() {
     // TODO
+    put_word(POP);
+    put_word(STA);
+    put_word(WORK_MEM);
+    put_word(POP);
+    put_word(DIV);
+    put_word(WORK_MEM);
+    put_word(PUSH);
 }
 
 void write_ask_var(short index, char *name) {
     // TODO
+    write_string("Zadajte premennu ");write_string(name);write_string(": ");
+    put_word(INP);
+    put_op_attr(STA, index + VAR_OFFSET);
 }
-
-

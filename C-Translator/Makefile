@@ -1,9 +1,9 @@
 CC=gcc
 FLAGS=-std=c99
-all: interpret
+all: main
 
-interpret: interpret.c lexer.o generator.o
-	$(CC) $(FLAGS) -lm interpret.c lexer.o generator.o -o interpret
+main: main.c lexer.o generator.o
+	$(CC) $(FLAGS) -lm main.c lexer.o generator.o -o main
 
 lexer.o: lexer.c
 	$(CC) $(FLAGS) lexer.c -c
