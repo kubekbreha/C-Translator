@@ -53,11 +53,12 @@ int store_id(char *id) {
  * Volanie nastavi nove hodnoty lex_symbol a lex_attr. */
 void next_symbol(){
     c = input[ic];
-    ic++;
+    ic = ic + 1;
     while (isspace(c)) { // Preskocenie medzier
         c = input[ic];
-        ic++;
+        ic = ic + 1;
     }
+
     switch (c) {
     case ',': lex_symbol = COMMA; break;
     case '+': lex_symbol = PLUS;  break;
@@ -75,6 +76,7 @@ void next_symbol(){
             lex_symbol = VALUE;
             lex_attr = 0;
             do {
+                //nasobenie cisla aby bolo cislo stale vecsie (254)
                 lex_attr = lex_attr * 10;
                 lex_attr = lex_attr + (c - '0'); //asci hodnota nuly
 
@@ -97,9 +99,9 @@ void next_symbol(){
             id[id_len] = 0;
 
             // Kontrola klucovych slov
-            if (strcmp(id, "read") == 0) {
+            if (!strcmp(id, "read")) {
                 lex_symbol = READ;
-            } else if (strcmp(id, "print") == 0) {
+            } else if (!strcmp(id, "print") == 0) {
                 lex_symbol = PRINT;
             } else { // Ulozenie do tabulky identifikatorov
                 lex_attr = store_id(id);
