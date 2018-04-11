@@ -1,3 +1,11 @@
+//
+//  lexter.h
+//  c-translator
+//
+//  Created by Jakub Brehuv on 11/04/2018.
+//  Copyright © 2018 Jakub Brehuv. All rights reserved.
+//
+
 #ifndef LEXER_H
 #define LEXER_H
 
@@ -25,13 +33,14 @@ void init_lexer(char *string);
 
 /* Precitanie dalsieho symbolu.
  * Volanie nastavi nove hodnoty lex_symbol a lex_attr. */
-void next_symbol();
+void next_symbol(void);
 
 /* Vypis vsetky lexikalnych jednotiek zo vstupu */
-void print_tokens();
+void print_tokens(void);
 
 /* Nazov lexikalnej jednotky */
 const char *symbol_name(Symbol symbol);
 
 #endif /* LEXER_H */
+
 

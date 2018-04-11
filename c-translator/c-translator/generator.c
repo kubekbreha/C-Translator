@@ -1,3 +1,11 @@
+//
+//  generator.c
+//  c-translator
+//
+//  Created by Jakub Brehuv on 11/04/2018.
+//  Copyright © 2018 Jakub Brehuv. All rights reserved.
+//
+
 #include <string.h>
 
 #include "generator.h"
@@ -59,7 +67,7 @@ void put_op_attr(short op, short value){
 
 typedef union {
     float R;
-
+    
     struct {
         unsigned short RL;
         unsigned short RH;
