@@ -414,7 +414,7 @@ int main (int argc, char **argv) {
     
     init_keysets();
     
-    char source[MAX_INPUT_SIZE] = "read b; if(b==3){ print(a+b);}else{print(55);}";
+    char source[MAX_INPUT_SIZE] = "read b,a; if(b>3){ print(a+b);}else{print(55);}";
     
     init_lexer(source);
     print_tokens();

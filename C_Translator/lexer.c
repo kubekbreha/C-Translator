@@ -12,35 +12,53 @@
 #include <string.h>
 #include "lexer.h"
 
-/* Nazvy symbolov (len pre ich jednoduchsi vypis) */
+/* Symboles name */
 const char *SYM_NAMES[] = {
-    [VAR] = "VAR", [WHILE] = "WHILE", [IF] = "IF", [ELSE] = "ELSE",
-    [READ]="READ", [PRINT]="PRINT",
-    [COMMA]="COMMA", [SEMICOLON]="SEMICOLON",
-    [ID]="ID", [VALUE]="VALUE",
-    [LPAR]="LPAR", [RPAR]="RPAR", [LCRLB] = "LCRLB", [RCRLB] = "RCRLB",
-    [PLUS]="PLUS", [MINUS]="MINUS", [MUL]="MUL", [DIV]="DIV", [POWER]="POWER",
+    [VAR] = "VAR",
+    [WHILE] = "WHILE",
+    [IF] = "IF",
+    [ELSE] = "ELSE",
+    [READ]="READ",
+    [PRINT]="PRINT",
+    [COMMA]="COMMA",
+    [SEMICOLON]="SEMICOLON",
+    [ID]="ID",
+    [VALUE]="VALUE",
+    [LPAR]="LPAR",
+    [RPAR]="RPAR",
+    [LCRLB] = "LCRLB",
+    [RCRLB] = "RCRLB",
+    [PLUS]="PLUS",
+    [MINUS]="MINUS",
+    [MUL]="MUL",
+    [DIV]="DIV",
+    [POWER]="POWER",
     [EQUALS]="EQUALS",
-    [LESS]="LESS", [GREATER]="GREATER", [LESSEQ] = "LESSEQ", [GREATEQ] = "GREATEQ",
-    [EQTO]="EQTO", [NOTEQ]="NOTEQ",
-    [SEOF]="SEOF", [SERROR]="SERROR",
+    [LESS]="LESS",
+    [GREATER]="GREATER",
+    [LESSEQ] = "LESSEQ",
+    [GREATEQ] = "GREATEQ",
+    [EQTO]="EQTO",
+    [NOTEQ]="NOTEQ",
+    [SEOF]="SEOF",
+    [SERROR]="SERROR",
 };
 
-/* Globalne premenne, "public" */
+/* Global variables, "public" */
 Symbol lex_symbol;
 int lex_attr;
 
 char *lex_ids[LEX_IDS_MAX];
-int lex_ids_size; // Pocet ulozenych identifikatorov
+int lex_ids_size; // Number of saved identivicators
 
 
-/* Vstupne premenne */
-static char *input;     // Vstupny retazec
-static char c;          // Spracovavany vstupny znak
-static int ic;          // Index dalsieho znaku vo vstupnom retazci
+/* Input variables */
+static char *input;     // Input string
+static char c;          // Proccesed input char
+static int ic;          // Index of next char in string
 
 
-/* Inicializacia lex. analyzatora. Parametrom je vstupny retazec. */
+/* Initialization lex. analyzator. Parameter is input string. */
 void init_lexer(char *string)
 {
     input = string;
@@ -49,8 +67,8 @@ void init_lexer(char *string)
 }
 
 
-/* Ulozenie identifikatora `id` do tabulky identifikatorov ak tam este nie je.
- * Vracia index, na ktorom je identifikator ulozeny. */
+/* Identificator saving `id` to table with identificatrs if already isnt there.
+ * Return index on which identificator is saved. */
 int store_id(char *id) {
     int i = 0;
     while (i < lex_ids_size) {
@@ -63,12 +81,12 @@ int store_id(char *id) {
     return i;
 }
 
-/* Precitanie dalsieho symbolu.
- * Volanie nastavi nove hodnoty lex_symbol a lex_attr. */
+/* Read next char
+   Call set new valuest to lex_symbol and lex_attr. */
 void next_symbol()
 {
     c = input[ic++];
-    while (isspace(c)) { // Preskocenie medzier
+    while (isspace(c)) { // Skip spaces
         c = input[ic++];
     }
     
@@ -112,15 +130,12 @@ void next_symbol()
             c = input[ic++];
             if (c == '=') {
                 lex_symbol = NOTEQ;
-            } else {
-                //lex_symbol = NEG;
-                lex_symbol = SERROR; // TODO: add support for negation?
             }
             break;
         case ';':  lex_symbol = SEMICOLON;  break;
         case '{':  lex_symbol = LCRLB;      break;
         case '}':  lex_symbol = RCRLB;      break;
-        case '\0': lex_symbol = SEOF;       break; // Koniec retazce
+        case '\0': lex_symbol = SEOF;       break; // End of string
         default:
             if (isdigit(c)) {
                 lex_symbol = VALUE;
@@ -134,21 +149,20 @@ void next_symbol()
                 } while (isdigit(c));
                 ic--;
             } else if (isalpha(c)) {
-                int id_start = ic - 1; // Index zaciatku identifikatora
+                int id_start = ic - 1; // Index od identificator begining
                 do {
                     c = input[ic];
                     ic++;
                 } while (isalnum(c));
-                ic--; // "Vratenie" posledneho znaku
+                ic--; // "Return" last char
                 
-                // Skopirovanie identifikatora
-                // char *id = strndup(&input[id_start], ic - id_start);
+                // Copy identificator
                 int id_len = ic - id_start;
                 char *id = malloc(id_len + 1);
                 memcpy(id, &input[id_start], id_len);
                 id[id_len] = 0;
                 
-                // Kontrola klucovych slov
+                // Check of keywords
                 if (!strcmp(id, "read")) {
                     lex_symbol = READ;
                 } else if (!strcmp(id, "print")) {
@@ -161,7 +175,7 @@ void next_symbol()
                     lex_symbol = IF;
                 } else if (!strcmp(id, "else")) {
                     lex_symbol = ELSE;
-                } else { // Ulozenie do tabulky identifikatorov
+                } else { // Saving to identificator table
                     lex_attr = store_id(id);
                     lex_symbol = ID;
                 }
@@ -173,14 +187,14 @@ void next_symbol()
 }
 
 
-/* Nazov lexikalnej jednotky */
+/* Name of lexical unit */
 const char *symbol_name(Symbol symbol)
 {
     return SYM_NAMES[symbol];
 }
 
 
-/* Vypis vsetky lexikalnych jednotiek zo vstupu */
+/* Write all lexical units from input */
 void print_tokens()
 {
     printf("\nVystup lexikalnej analyzy (retazec symbolov)\n");

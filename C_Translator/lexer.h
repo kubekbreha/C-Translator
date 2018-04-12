@@ -40,10 +40,10 @@ void init_lexer(char *string);
 
 /* Precitanie dalsieho symbolu.
  * Volanie nastavi nove hodnoty lex_symbol a lex_attr. */
-void next_symbol();
+void next_symbol(void);
 
 /* Vypis vsetky lexikalnych jednotiek zo vstupu */
-void print_tokens();
+void print_tokens(void);
 
 /* Nazov lexikalnej jednotky */
 const char *symbol_name(Symbol symbol);
