@@ -1,8 +1,8 @@
 //
-//  lexter.h
-//  c-translator
+//  lexer.h
+//  C_Translator
 //
-//  Created by Jakub Brehuv on 11/04/2018.
+//  Created by Jakub Brehuv on 12/04/2018.
 //  Copyright © 2018 Jakub Brehuv. All rights reserved.
 //
 
@@ -14,7 +14,14 @@
 
 /* Typy symbolov - lexikalnych jednotiek */
 typedef enum {
-    VALUE, ID, READ, PRINT, PLUS, MINUS, MUL, DIV, POWER, LPAR, RPAR, COMMA,
+    VAR, WHILE, IF, ELSE,
+    READ, PRINT,
+    COMMA, SEMICOLON,
+    ID, VALUE,
+    LPAR, RPAR, LCRLB, RCRLB,
+    PLUS, MINUS, MUL, DIV, POWER,
+    EQUALS,
+    LESS, GREATER, LESSEQ, GREATEQ, EQTO, NOTEQ,
     SEOF, SERROR
 } Symbol;
 
@@ -33,14 +40,13 @@ void init_lexer(char *string);
 
 /* Precitanie dalsieho symbolu.
  * Volanie nastavi nove hodnoty lex_symbol a lex_attr. */
-void next_symbol(void);
+void next_symbol();
 
 /* Vypis vsetky lexikalnych jednotiek zo vstupu */
-void print_tokens(void);
+void print_tokens();
 
 /* Nazov lexikalnej jednotky */
 const char *symbol_name(Symbol symbol);
 
 #endif /* LEXER_H */
-
 

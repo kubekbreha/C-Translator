@@ -1,8 +1,8 @@
 //
-//  lexter.c
-//  c-translator
+//  lexer.c
+//  C_Translator
 //
-//  Created by Jakub Brehuv on 11/04/2018.
+//  Created by Jakub Brehuv on 12/04/2018.
 //  Copyright © 2018 Jakub Brehuv. All rights reserved.
 //
 
@@ -14,10 +14,16 @@
 
 /* Nazvy symbolov (len pre ich jednoduchsi vypis) */
 const char *SYM_NAMES[] = {
-    [VALUE]="VALUE", [ID]="ID", [READ]="READ", [PRINT]="PRINT",
+    [VAR] = "VAR", [WHILE] = "WHILE", [IF] = "IF", [ELSE] = "ELSE",
+    [READ]="READ", [PRINT]="PRINT",
+    [COMMA]="COMMA", [SEMICOLON]="SEMICOLON",
+    [ID]="ID", [VALUE]="VALUE",
+    [LPAR]="LPAR", [RPAR]="RPAR", [LCRLB] = "LCRLB", [RCRLB] = "RCRLB",
     [PLUS]="PLUS", [MINUS]="MINUS", [MUL]="MUL", [DIV]="DIV", [POWER]="POWER",
-    [LPAR]="LPAR", [RPAR]="RPAR", [COMMA]="COMMA",
-    [SEOF]="SEOF", [SERROR]="SERROR"
+    [EQUALS]="EQUALS",
+    [LESS]="LESS", [GREATER]="GREATER", [LESSEQ] = "LESSEQ", [GREATEQ] = "GREATEQ",
+    [EQTO]="EQTO", [NOTEQ]="NOTEQ",
+    [SEOF]="SEOF", [SERROR]="SERROR",
 };
 
 /* Globalne premenne, "public" */
@@ -35,7 +41,8 @@ static int ic;          // Index dalsieho znaku vo vstupnom retazci
 
 
 /* Inicializacia lex. analyzatora. Parametrom je vstupny retazec. */
-void init_lexer(char *string){
+void init_lexer(char *string)
+{
     input = string;
     ic = 0;
     lex_ids_size = 0;
@@ -56,37 +63,72 @@ int store_id(char *id) {
     return i;
 }
 
-
 /* Precitanie dalsieho symbolu.
  * Volanie nastavi nove hodnoty lex_symbol a lex_attr. */
-void next_symbol(){
-    c = input[ic];
-    ic = ic + 1;
+void next_symbol()
+{
+    c = input[ic++];
     while (isspace(c)) { // Preskocenie medzier
-        c = input[ic];
-        ic = ic + 1;
+        c = input[ic++];
     }
     
     switch (c) {
-        case ',': lex_symbol = COMMA; break;
-        case '+': lex_symbol = PLUS;  break;
-        case '-': lex_symbol = MINUS; break;
-        case '*': lex_symbol = MUL;   break;
-        case '/': lex_symbol = DIV;   break;
-        case '^': lex_symbol = POWER; break;
-        case '(': lex_symbol = LPAR;  break;
-        case ')': lex_symbol = RPAR;  break;
-        case '\0': lex_symbol = SEOF; break; // Koniec retazce
+        case ',':  lex_symbol = COMMA;      break;
+        case '+':  lex_symbol = PLUS;       break;
+        case '-':  lex_symbol = MINUS;      break;
+        case '*':  lex_symbol = MUL;        break;
+        case '/':  lex_symbol = DIV;        break;
+        case '^':  lex_symbol = POWER;      break;
+        case '(':  lex_symbol = LPAR;       break;
+        case ')':  lex_symbol = RPAR;       break;
+        case '<':
+            c = input[ic++];
+            if (c == '=') {
+                lex_symbol = LESSEQ;
+            } else {
+                lex_symbol = LESS;
+                --ic;
+            }
+            break;
+        case '>':
+            c = input[ic++];
+            if (c == '=') {
+                lex_symbol = GREATEQ;
+            } else {
+                lex_symbol = GREATER;
+                --ic;
+            }
+            break;
+        case '=':
+            c = input[ic++];
+            if (c == '=') {
+                lex_symbol = EQTO;
+            } else {
+                lex_symbol = EQUALS;
+                --ic;
+            }
+            break;
+        case '!':
+            c = input[ic++];
+            if (c == '=') {
+                lex_symbol = NOTEQ;
+            } else {
+                //lex_symbol = NEG;
+                lex_symbol = SERROR; // TODO: add support for negation?
+            }
+            break;
+        case ';':  lex_symbol = SEMICOLON;  break;
+        case '{':  lex_symbol = LCRLB;      break;
+        case '}':  lex_symbol = RCRLB;      break;
+        case '\0': lex_symbol = SEOF;       break; // Koniec retazce
         default:
             if (isdigit(c)) {
-                // TODO Doplnit rozpoznanie celociselnej konstanty (VALUE)
-                // hodnota konstanty musi byt ulozena do lex_attr
                 lex_symbol = VALUE;
                 lex_attr = 0;
+                
                 do {
-                    //nasobenie cisla aby bolo cislo stale vecsie (254)
-                    lex_attr = lex_attr * 10;
-                    lex_attr = lex_attr + (c - '0'); //asci hodnota nuly
+                    lex_attr *= 10;
+                    lex_attr += (c - '0');
                     
                     c = input[ic++];
                 } while (isdigit(c));
@@ -111,6 +153,14 @@ void next_symbol(){
                     lex_symbol = READ;
                 } else if (!strcmp(id, "print")) {
                     lex_symbol = PRINT;
+                } else if (!strcmp(id, "var")) {
+                    lex_symbol = VAR;
+                } else if (!strcmp(id, "while")) {
+                    lex_symbol = WHILE;
+                } else if (!strcmp(id, "if")) {
+                    lex_symbol = IF;
+                } else if (!strcmp(id, "else")) {
+                    lex_symbol = ELSE;
                 } else { // Ulozenie do tabulky identifikatorov
                     lex_attr = store_id(id);
                     lex_symbol = ID;
@@ -124,13 +174,15 @@ void next_symbol(){
 
 
 /* Nazov lexikalnej jednotky */
-const char *symbol_name(Symbol symbol){
+const char *symbol_name(Symbol symbol)
+{
     return SYM_NAMES[symbol];
 }
 
 
 /* Vypis vsetky lexikalnych jednotiek zo vstupu */
-void print_tokens(){
+void print_tokens()
+{
     printf("\nVystup lexikalnej analyzy (retazec symbolov)\n");
     do {
         next_symbol();
@@ -140,4 +192,3 @@ void print_tokens(){
         printf("\n");
     } while (lex_symbol != SEOF);
 }
-

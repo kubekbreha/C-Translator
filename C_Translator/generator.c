@@ -1,8 +1,8 @@
 //
 //  generator.c
-//  c-translator
+//  C_Translator
 //
-//  Created by Jakub Brehuv on 11/04/2018.
+//  Created by Jakub Brehuv on 12/04/2018.
 //  Copyright © 2018 Jakub Brehuv. All rights reserved.
 //
 
@@ -115,6 +115,8 @@ void write_end(){
 void write_result() {
     put_word(POP);
     put_word(OUT);
+    
+    write_string("\n");
 }
 
 void write_number(short value) {
@@ -131,55 +133,114 @@ void write_string(const char *str){
 }
 
 void write_var(short index) {
-    // TODO
-    put_op_attr(LDA, index+VAR_OFFSET);
-    put_word(PUSH);
-}
-
-void write_add() {
-    put_word(POP);
-    put_op_attr(STA, WORK_MEM);
-    put_word(POP);
-    put_op_attr(ADD, WORK_MEM);
-    put_word(PUSH);
-}
-
-void write_sub() {
-    // TODO
-    put_word(POP);
-    put_word(STA);
-    put_word(WORK_MEM);
-    put_word(POP);
-    put_word(SUB);
-    put_word(WORK_MEM);
-    put_word(PUSH);
-}
-
-void write_mul() {
-    // TODO
-    put_word(POP);
-    put_word(STA);
-    put_word(WORK_MEM);
-    put_word(POP);
-    put_word(MUL);
-    put_word(WORK_MEM);
-    put_word(PUSH);
-}
-
-void write_div() {
-    // TODO
-    put_word(POP);
-    put_word(STA);
-    put_word(WORK_MEM);
-    put_word(POP);
-    put_word(DIV);
-    put_word(WORK_MEM);
+    put_op_attr(LDA, VAR_OFFSET + index);
     put_word(PUSH);
 }
 
 void write_ask_var(short index, char *name) {
-    // TODO
-    write_string("Zadajte premennu ");write_string(name);write_string(": ");
+    write_string(name);
+    write_string(" = ");
+    
     put_word(INP);
-    put_op_attr(STA, index + VAR_OFFSET);
+    put_op_attr(STA, VAR_OFFSET + index);
+}
+
+void write_assignment(short index) {
+    put_word(POP);
+    
+    put_op_attr(STA, VAR_OFFSET + index);
+}
+
+void write_operation(enum OP_Code opcode) {
+    put_word(POP);
+    put_op_attr(STA, WORK_MEM);
+    put_word(POP);
+    put_op_attr(opcode, WORK_MEM);
+    put_word(PUSH);
+}
+
+void write_add() {
+    write_operation(ADD);
+}
+
+void write_sub() {
+    write_operation(SUB);
+}
+
+void write_mul() {
+    write_operation(MUL);
+}
+
+void write_div() {
+    write_operation(DIV);
+}
+
+void write_greater() {
+    write_operation(GT);
+}
+
+void write_less() {
+    write_operation(LT);
+}
+
+void write_greater_equal() {
+    write_operation(GE);
+}
+
+void write_less_equal() {
+    write_operation(LE);
+}
+
+void write_equals_to() {
+    write_operation(EQ);
+}
+
+void write_not_equals_to() {
+    write_operation(NE);
+}
+
+void write_jump_to(short address) {
+    put_op_attr(JMP, address);
+}
+
+void write_branch_zero_to(short address) {
+    put_word(POP);
+    put_op_attr(BZE, address);
+}
+
+void modify_value_on_address(short address, short value) {
+    code_list[address] = value;
+}
+
+void write_power() {
+    put_word(POP);
+    put_op_attr(STA, WORK_MEM);
+    put_op_attr(LDX, WORK_MEM);
+    
+    put_word(POP);
+    put_word(PUSH);
+    put_word(PUSH);
+    
+    short conditionAddr = get_address();
+    
+    put_op_attr(STX, WORK_MEM);
+    put_op_attr(LDA, WORK_MEM);
+    
+    put_op_attr(SUBM, 1);
+    put_op_attr(STA, WORK_MEM);
+    put_op_attr(LDX, WORK_MEM);
+    put_op_attr(BZE, 0);
+    
+    short jmpAddr = get_address() - 1;
+    
+    write_mul();
+    
+    put_op_attr(LDA, WORK_MEM);
+    put_word(PUSH);
+    
+    put_op_attr(JMP, conditionAddr);
+    
+    modify_value_on_address(jmpAddr, get_address());
+    
+    put_word(POP);
 }
