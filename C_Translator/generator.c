@@ -115,7 +115,6 @@ void write_end(){
 void write_result() {
     put_word(POP);
     put_word(OUT);
-    
     write_string("\n");
 }
 
@@ -140,14 +139,12 @@ void write_var(short index) {
 void write_ask_var(short index, char *name) {
     write_string(name);
     write_string(" = ");
-    
     put_word(INP);
     put_op_attr(STA, VAR_OFFSET + index);
 }
 
 void write_assignment(short index) {
     put_word(POP);
-    
     put_op_attr(STA, VAR_OFFSET + index);
 }
 

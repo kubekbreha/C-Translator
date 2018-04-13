@@ -44,27 +44,21 @@ const char *SYM_NAMES[] = {
     [SERROR]="SERROR",
 };
 
-
-
 /* Global variables, "public" */
 Symbol lex_symbol;
 int lex_attr;
 int error_position = 0;
 
-
 char *lex_ids[LEX_IDS_MAX];
 int lex_ids_size; // Number of saved identivicators
-
 
 /* Input variables */
 static char *input;     // Input string
 static char c;          // Proccesed input char
 static int ic;          // Index of next char in string
 
-
 /* Initialization lex. analyzator. Parameter is input string. */
-void init_lexer(char *string)
-{
+void init_lexer(char *string){
     input = string;
     ic = 0;
     lex_ids_size = 0;
@@ -74,34 +68,30 @@ void init_lexer(char *string)
 /* Identificator saving `id` to table with identificatrs if already isnt there.
  * Return index on which identificator is saved. */
 int store_id(char *id) {
-    int i = 0;
-    while (i < lex_ids_size) {
-        if (strcmp(id, lex_ids[i]) == 0)
-            return i;
-        i++;
+    int idx = 0;
+    while (idx < lex_ids_size) {
+        if (strcmp(id, lex_ids[idx]) == 0)
+            return idx;
+        idx++;
     }
-    lex_ids[i] = strdup(id);
+    lex_ids[idx] = strdup(id);
     lex_ids_size++;
-    return i;
+    return idx;
 }
 
 int get_error_position(){
     return error_position;
 }
 
-
-
 /* Read next char
    Call set new valuest to lex_symbol and lex_attr. */
-void next_symbol()
-{
-
+void next_symbol(){
     c = input[ic++];
     error_position = ic;
     while (isspace(c)) { // Skip spaces
         c = input[ic++];
     }
-    
+
     switch (c) {
         case ',':  lex_symbol = COMMA;      break;
         case '+':  lex_symbol = PLUS;       break;
@@ -200,15 +190,13 @@ void next_symbol()
 
 
 /* Name of lexical unit */
-const char *symbol_name(Symbol symbol)
-{
+const char *symbol_name(Symbol symbol){
     return SYM_NAMES[symbol];
 }
 
 
 /* Write all lexical units from input */
-void print_tokens()
-{
+void print_tokens(){
     printf("\nOutput of lexical analyse (string of symbols)\n");
     do {
         next_symbol();
