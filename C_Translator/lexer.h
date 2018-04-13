@@ -48,5 +48,7 @@ void print_tokens(void);
 /* Nazov lexikalnej jednotky */
 const char *symbol_name(Symbol symbol);
 
+int get_error_position(void);
+
 #endif /* LEXER_H */
 

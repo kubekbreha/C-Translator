@@ -31,6 +31,9 @@ KeySet H_Statement;
 KeySet H_Variable;
 KeySet H_Program;
 
+int error_counter = 0;
+char error_string[MAX_INPUT_SIZE] = "";
+
 void init_keysets() {
     H_Operation = E VALUE | E ID | E LPAR;
     H_Power = H_Operation;
@@ -59,18 +62,24 @@ operation(KeySet keySet);
 
 void error(const char *msg, KeySet K) {
     fprintf(stderr, "CHYBA: %s\n", msg);
-    
+    error_counter++;
     while (!(E lex_symbol & K))
         next_symbol();
+    
+    int err_pos = get_error_position();
+    printf("Error on %d position.\n", err_pos);
+    error_string[err_pos-1] = 94;
 }
 
 void check(const char *msg, KeySet K) {
-    if (!(E lex_symbol & K))
+    if (!(E lex_symbol & K)){
         error(msg, K);
+    }
 }
 
 
 int match(const Symbol expected, KeySet K) {
+
     if (lex_symbol == expected) {
         int attr = lex_attr;
         next_symbol();
@@ -95,6 +104,8 @@ void program(KeySet keySet) {
         variables_counter += variable(allKeys);
         
         check("PR2", allKeys);
+        
+
     }
     
     write_begin(variables_counter);
@@ -103,7 +114,6 @@ void program(KeySet keySet) {
     
     while (lex_symbol != SEOF && lex_symbol != SERROR) {
         statement(keySet | H_Statement);
-        
         check("PR4", keySet | H_Statement);
     }
     
@@ -374,6 +384,7 @@ void power(KeySet keySet) {
 }
 
 
+
 void operation(KeySet keySet) {
     switch (lex_symbol) {
         case VALUE: {
@@ -412,18 +423,28 @@ FILE* open_file(char *file_name, char* access) {
 
 int main (int argc, char **argv) {
     
+    for(int i = 0; i < MAX_INPUT_SIZE; i++){
+        error_string[i] = ' ';
+    }
+    
     init_keysets();
     
-    char source[MAX_INPUT_SIZE] = "read b,a; if(b>3){ print(a+b);}else{print(55);}";
+    //char source[MAX_INPUT_SIZE] = "citaj a; citaj b; if(b >= 3){ pisaj(a+b);}else{pisaj(a-a);}";
+    //char source[MAX_INPUT_SIZE] = "woor a;woor b;woi(b>=10){woop(aˆb);}woe{woop(aˆb);}";
+    char source[MAX_INPUT_SIZE] = "woor fer; woooo(fer != 5){woop( 3+5); fer = fer + 1;}";
+    
+    //char source[MAX_INPUT_SIZE] = "woope(2*3;";
+    
+    //char source[MAX_INPUT_SIZE] = "woop(3ˆ3);";
     
     init_lexer(source);
-    print_tokens();
+    //print_tokens();
     
     FILE* output_file = open_file("program.bin", "wb");
     init_generator(output_file);
     
     next_symbol();
-    program(E SEOF | H_Program);
+    program(E SEOF);
     if (lex_symbol != SEOF) {
         error("Ocakavany je koniec suboru", E SEOF);
     }
@@ -431,8 +452,10 @@ int main (int argc, char **argv) {
     generate_output();
     
     fclose(output_file);
+    printf("This program have %d errors.\n", error_counter);
     
-  
+    printf("\n%s\n", source);
+    printf("%s\n", error_string);
     
     return 0;
 }

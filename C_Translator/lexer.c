@@ -44,9 +44,13 @@ const char *SYM_NAMES[] = {
     [SERROR]="SERROR",
 };
 
+
+
 /* Global variables, "public" */
 Symbol lex_symbol;
 int lex_attr;
+int error_position = 0;
+
 
 char *lex_ids[LEX_IDS_MAX];
 int lex_ids_size; // Number of saved identivicators
@@ -81,11 +85,19 @@ int store_id(char *id) {
     return i;
 }
 
+int get_error_position(){
+    return error_position;
+}
+
+
+
 /* Read next char
    Call set new valuest to lex_symbol and lex_attr. */
 void next_symbol()
 {
+
     c = input[ic++];
+    error_position = ic;
     while (isspace(c)) { // Skip spaces
         c = input[ic++];
     }
@@ -163,17 +175,17 @@ void next_symbol()
                 id[id_len] = 0;
                 
                 // Check of keywords
-                if (!strcmp(id, "read")) {
+                if (!strcmp(id, "woor")) {                  //read
                     lex_symbol = READ;
-                } else if (!strcmp(id, "print")) {
+                } else if (!strcmp(id, "woop")) {           //write
                     lex_symbol = PRINT;
-                } else if (!strcmp(id, "var")) {
+                } else if (!strcmp(id, "w")) {              //war
                     lex_symbol = VAR;
-                } else if (!strcmp(id, "while")) {
+                } else if (!strcmp(id, "woooo")) {          //while
                     lex_symbol = WHILE;
-                } else if (!strcmp(id, "if")) {
+                } else if (!strcmp(id, "woi")) {            //if
                     lex_symbol = IF;
-                } else if (!strcmp(id, "else")) {
+                } else if (!strcmp(id, "woe")) {            //else
                     lex_symbol = ELSE;
                 } else { // Saving to identificator table
                     lex_attr = store_id(id);
