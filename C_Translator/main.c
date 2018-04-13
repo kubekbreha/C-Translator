@@ -61,7 +61,7 @@ power(KeySet keySet),
 operation(KeySet keySet);
 
 void error(const char *msg, KeySet K) {
-    fprintf(stderr, "CHYBA: %s\n", msg);
+    fprintf(stderr, "ERROR: %s\n", msg);
     error_counter++;
     while (!(E lex_symbol & K))
         next_symbol();
@@ -86,7 +86,7 @@ int match(const Symbol expected, KeySet K) {
         return attr;
     } else {
         char *msg = malloc(100);
-        snprintf(msg, 100, "Ocakavany symbol %s, namiesto toho sa vyskytol %s",
+        snprintf(msg, 100, "Expected symbol %s, instead %s occurs",
                  symbol_name(expected), symbol_name(lex_symbol));
         error(msg, K);
         return 0;
@@ -297,7 +297,7 @@ void expr(KeySet keySet) {
             write_fn = write_not_equals_to;
             break;
         default:
-            error("Ocakavana operacia porovnavania", keySet | H_Addition);
+            error("Expected comparison operation", keySet | H_Addition);
             break;
     }
     
@@ -327,7 +327,7 @@ void addition(KeySet keySet) {
                 write_fn = write_sub;
                 break;
             default:
-                error("Ocakavana operacia + alebo -", keySet | H_Mul);
+                error("Expected operation + or -", keySet | H_Mul);
                 return;
         }
         
@@ -359,7 +359,7 @@ void mul(KeySet keySet) {
                 write_fn = write_div;
                 break;
             default:
-                error("Ocakavana operacia * alebo /", keySet | H_Power);
+                error("Expected operation * or /", keySet | H_Power);
                 return;
         }
         
@@ -407,7 +407,7 @@ void operation(KeySet keySet) {
             match(RPAR, keySet);
             break;
         default:
-            error("Ocakavana konstanta, premenna alebo (", keySet);
+            error("Expected const, variable or (", keySet);
             break;
     }
 }
@@ -426,12 +426,10 @@ int main (int argc, char **argv) {
     for(int i = 0; i < MAX_INPUT_SIZE; i++){
         error_string[i] = ' ';
     }
-    
     init_keysets();
     
-    //char source[MAX_INPUT_SIZE] = "citaj a; citaj b; if(b >= 3){ pisaj(a+b);}else{pisaj(a-a);}";
     //char source[MAX_INPUT_SIZE] = "woor a;woor b;woi(b>=10){woop(aˆb);}woe{woop(aˆb);}";
-    char source[MAX_INPUT_SIZE] = "woor fer; woooo(fer != 5){woop( 3+5); fer = fer + 1;}";
+    char source[MAX_INPUT_SIZE] = "woor fer; woooo(fer != 5){woop( +5); fer = fer + 1;}";
     
     //char source[MAX_INPUT_SIZE] = "woope(2*3;";
     
@@ -452,9 +450,10 @@ int main (int argc, char **argv) {
     generate_output();
     
     fclose(output_file);
-    printf("This program have %d errors.\n", error_counter);
+    printf("This program compiled with %d errors.\n", error_counter);
     
-    printf("\n%s\n", source);
+    printf("This is user input: \n");
+    printf("%s\n", source);
     printf("%s\n", error_string);
     
     return 0;

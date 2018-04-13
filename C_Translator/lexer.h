@@ -9,10 +9,10 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-/* Velkost tabulky identifikatorov */
+/* Size of identificators table */
 #define LEX_IDS_MAX 20
 
-/* Typy symbolov - lexikalnych jednotiek */
+/* Type of symbols - lexial units */
 typedef enum {
     VAR, WHILE, IF, ELSE,
     READ, PRINT,
@@ -25,27 +25,27 @@ typedef enum {
     SEOF, SERROR
 } Symbol;
 
-/* Vystupny symbol lexikalnej analyzy a jeho atribut.
- * Ak symbol je VALUE, atribut obsahuje jeho celociselnu hodnotu,
- * ak je to ID, atribut obsahuje index do tabulky identifikatorov. */
+/* utput symbol of lexical analyze and its atribute.
+ * If symbol is value, atribut contains its value,
+ * if its ID, atribut contanins ID to identificators table. */
 extern Symbol lex_symbol;
 extern int lex_attr;
 
-/* Tabulka identifikatorov */
+/* Table of identificators */
 extern char *lex_ids[LEX_IDS_MAX];
-extern int lex_ids_size; // Pocet ulozenych identifikatorov
+extern int lex_ids_size; // Count of saved identificators
 
-/* Inicializacia lex. analyzatora. Parametrom je vstupny retazec. */
+/* Initialization lex. analyzator. Parameter is input string. */
 void init_lexer(char *string);
 
-/* Precitanie dalsieho symbolu.
- * Volanie nastavi nove hodnoty lex_symbol a lex_attr. */
+/* Next symbol reading.
+ * Call set value of lex_symbol and lex_attr. */
 void next_symbol(void);
 
-/* Vypis vsetky lexikalnych jednotiek zo vstupu */
+/* Vrite all lexical numbers from input */
 void print_tokens(void);
 
-/* Nazov lexikalnej jednotky */
+/* Name of lexical unit */
 const char *symbol_name(Symbol symbol);
 
 int get_error_position(void);
