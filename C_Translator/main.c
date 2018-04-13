@@ -429,9 +429,9 @@ int main (int argc, char **argv) {
     init_keysets();
     
     //char source[MAX_INPUT_SIZE] = "woor a;woor b;woi(b>=10){woop(aˆb);}woe{woop(aˆb);}";
-    char source[MAX_INPUT_SIZE] = "woor fer; woooo(fer != 5){woop( +5); fer = fer + 1;}";
+    //char source[MAX_INPUT_SIZE] = "woor fer; woooo(fer != 5){woop( +5); fer = fer + 1;}";
     
-    //char source[MAX_INPUT_SIZE] = "woope(2*3;";
+    char source[MAX_INPUT_SIZE] = "woope(helloworld)";
     
     //char source[MAX_INPUT_SIZE] = "woop(3ˆ3);";
     

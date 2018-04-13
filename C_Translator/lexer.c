@@ -209,7 +209,7 @@ const char *symbol_name(Symbol symbol)
 /* Write all lexical units from input */
 void print_tokens()
 {
-    printf("\nVystup lexikalnej analyzy (retazec symbolov)\n");
+    printf("\nOutput of lexical analyse (string of symbols)\n");
     do {
         next_symbol();
         printf("  [%2d] %s", lex_symbol, symbol_name(lex_symbol));
